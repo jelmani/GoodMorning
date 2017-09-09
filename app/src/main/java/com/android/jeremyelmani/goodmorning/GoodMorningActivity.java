@@ -1,5 +1,9 @@
 package com.android.jeremyelmani.goodmorning;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.Activity;
@@ -28,7 +32,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class GoodMorningActivity extends Activity implements
+public class GoodMorningActivity extends FragmentActivity implements
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback
 {
 
@@ -55,7 +59,13 @@ public class GoodMorningActivity extends Activity implements
 
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
 
-        mainText = (TextView) findViewById(R.id.mainText);
+        FragmentManager fm = getFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+
+        if(fragment == null){
+            fragment = new HomePageFragment();
+            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
+        }
     }
 
     @Override
@@ -95,7 +105,6 @@ public class GoodMorningActivity extends Activity implements
             @Override
             public void success(Track track, Response response) {
                 Log.d("Album success", track.name);
-                mainText.setText(track.name);
             }
 
             @Override
@@ -150,6 +159,13 @@ public class GoodMorningActivity extends Activity implements
                 });
             }
         }
+    }
+
+    public void switchFragment(Fragment fragment, int id){
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(id, fragment);
+        transaction.commit();
     }
 
 }
